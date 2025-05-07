@@ -1,27 +1,33 @@
 import React from 'react';
+import { Player, BoardState } from '../types/game';
 
-type Cell = 0 | 1 | 2;
-type BoardType = Cell[][];
 interface BoardProps {
-	board: BoardType;
-	validMoves: boolean[][];
+	board: BoardState;
+	validMoves: number[][];
 	onClick: (row: number, col: number) => void;
 }
 
 const Board: React.FC<BoardProps> = ({ board, validMoves, onClick }) => {
-	console.log('board', board);
+	const isValidMove = (row: number, col: number): boolean => {
+		return validMoves.some(([r, c]) => r === row && c === col);
+	};
+
 	return (
-		<div className="grid grid-cols-8 border-4 border-green-800">
-			{board.map((row, r) =>
-				row.map((cell, c) => (
+		<div className="grid grid-cols-8 gap-1 bg-green-800 p-2">
+			{board.map((row, rowIndex) =>
+				row.map((cell, colIndex) => (
 					<div
-						key={`${r}-${c}`}
-						className="w-12 h-12 bg-green-600 relative flex items-center justify-center cursor-pointer hover:bg-green-500"
-						onClick={() => onClick(r, c)}
+						key={`${rowIndex}-${colIndex}`}
+						className={`w-12 h-12 flex items-center justify-center cursor-pointer
+              ${isValidMove(rowIndex, colIndex) ? 'bg-green-600' : 'bg-green-700'}`}
+						onClick={() => onClick(rowIndex, colIndex)}
 					>
-						{cell === 1 && <div className="w-8 h-8 bg-black rounded-full" />}
-						{cell === 2 && <div className="w-8 h-8 bg-white rounded-full border" />}
-						{cell === 0 && validMoves[r][c] && <div className="w-3 h-3 bg-gray-200 rounded-full opacity-75" />}
+						{cell !== Player.EMPTY && (
+							<div
+								className={`w-10 h-10 rounded-full
+                ${cell === Player.BLACK ? 'bg-black' : 'bg-white'}`}
+							/>
+						)}
 					</div>
 				))
 			)}
